@@ -1292,6 +1292,30 @@ int send_vcont(libgdbr_t *g, const char *command, const char *thread_id) {
 		}
 	}
 
+	while (g->data[0] == 'I') {
+		if ((ret = send_ack (g)) < 0) {
+			goto end;
+		}
+		if (g->data_len == 0) {
+			ret = -1;
+			goto end;
+		}
+		if (g->data_len == 3 && g->data[0] == 'E'
+			    && isxdigit (g->data[1]) && isxdigit (g->data[2])) {
+			ret = -1;
+			goto end;
+		}
+		if (g->data[0] == 'I' && g->data_len % 2 == 1) {
+			// Console output from gdbserver
+			unpack_hex (g->data + 1, g->data_len - 1, g->data + 1);
+			g->data[g->data_len - 1] = '\0';
+			cb_printf ("%s", g->data + 1);
+		}
+		if ((ret = read_packet (g, false)) < 0) {
+			goto end;
+		}
+	}
+
 	ret = handle_cont (g);
 end:
 	r_cons_sleep_end (bed);
