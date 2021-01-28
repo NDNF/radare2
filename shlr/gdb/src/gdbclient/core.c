@@ -1305,11 +1305,10 @@ int send_vcont(libgdbr_t *g, const char *command, const char *thread_id) {
 			ret = -1;
 			goto end;
 		}
-		if (g->data[0] == 'I' && g->data_len % 2 == 1) {
-			// Console output from gdbserver
+		if (g->data_len % 2 == 1) {
 			unpack_hex (g->data + 1, g->data_len - 1, g->data + 1);
 			g->data[g->data_len - 1] = '\0';
-			cb_printf ("%s", g->data + 1);
+			r_cons_printf("%s", g->data + 1);
 		}
 		if ((ret = read_packet (g, false)) < 0) {
 			goto end;
