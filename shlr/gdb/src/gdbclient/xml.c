@@ -318,6 +318,12 @@ static int gdbr_parse_target_xml(libgdbr_t *g, char *xml_data, ut64 len) {
 			goto exit_err;
 		}
 		break;
+	case R_SYS_ARCH_AVR:
+		if (!(profile = r_str_prepend (profile,
+						"=PC	pc\n"
+						"=SP	sp\n"))) {
+			goto exit_err;
+		}
 	default:
 		// TODO others
 		if (*pc_alias) {
@@ -547,6 +553,9 @@ static int _resolve_arch(libgdbr_t *g, char *xml_data) {
 		} else if (r_str_startswith (arch, "mips")) {
 			g->target.arch = R_SYS_ARCH_MIPS;
 			g->target.bits = 32;
+		} else if (r_str_startswith (arch, "avr")) {
+			g->target.arch = R_SYS_ARCH_AVR;
+			g->target.bits = 8;
 		}
 		// TODO others
 	} else {
@@ -561,6 +570,9 @@ static int _resolve_arch(libgdbr_t *g, char *xml_data) {
 		} else if (strstr(xml_data, "com.apple.debugserver.x86_64")) {
 			g->target.arch = R_SYS_ARCH_X86;
 			g->target.bits = 64;
+		} else if (strstr(xml_data, "org.gnu.gdb.avr.cpu")) {
+			g->target.arch = R_SYS_ARCH_AVR;
+			g->target.bits = 8;
 		} else {
 			eprintf ("Warning: Unknown architecture parsing XML (%s)\n", xml_data);
 		}

@@ -1293,7 +1293,7 @@ int send_vcont(libgdbr_t *g, const char *command, const char *thread_id) {
 	}
 
 	while (g->data[0] == 'I') {
-		if ((ret = send_ack (g)) < 0) {
+                if ((ret = send_ack (g)) < 0) {
 			goto end;
 		}
 		if (g->data_len == 0) {
